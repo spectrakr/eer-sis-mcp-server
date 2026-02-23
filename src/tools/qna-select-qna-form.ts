@@ -1,7 +1,7 @@
 import {z} from "zod/v3";
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
 import {callCommand} from "../spring-client.js";
-import {successContent, errorContent} from "../types.js";
+import {errorContent, successContent} from "../types.js";
 
 /**
  * HTML contents에서 이미지 데이터를 필터링하고 HTML 태그를 제거하여 토큰 사용량을 줄입니다.
@@ -108,6 +108,7 @@ interface QnaForm {
     qnaProcessHistoryFormList?: ProcessHistory[];
     inAttachList?: unknown[];
     outAttachList?: unknown[];
+    taskId?: string;
 
     [key: string]: unknown;
 }
@@ -181,6 +182,7 @@ export function registerQnaSelectQnaForm(server: McpServer): void {
 
             const summary = {
                 ticketId: qna.refQnaId ?? qna.qnaId,
+                taskId: qna.taskId,
                 status: qna.ticketStatus,
                 questionTitle: qna.questionTitle,
                 answerTitle: qna.answerTitle,
