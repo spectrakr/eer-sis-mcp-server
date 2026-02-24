@@ -22,9 +22,9 @@ export function registerAllTools(server: McpServer): void {
   registerQnaSelectSiteConnLinkList(server);
 
   // kbUIService
-  registerKbSelectNodeId(server);
-  registerKbSelectSearchKbList(server);
-  registerKbGetTranslateScriptKmContents(server);
+  // registerKbSelectNodeId(server);
+  // registerKbSelectSearchKbList(server);
+  // registerKbGetTranslateScriptKmContents(server);
 
   // taskUIService
   registerTaskSelectTaskLogList(server);
