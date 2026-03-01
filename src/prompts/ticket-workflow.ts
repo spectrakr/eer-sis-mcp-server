@@ -1,5 +1,5 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {z} from "zod/v3";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod/v3";
 
 /**
  * 티켓 워크플로우 프롬프트
@@ -36,7 +36,7 @@ Parameter: taskId = ${taskId}
 \`\`\`
 **분석 정보:**
 - 업무 로그 (taskLogContents);
-`
+`;
 
 const TOOL_GROUP_TICKETS = (ticketId: string) => `### 그룹 티켓 조회 ✅
 \`\`\`
@@ -128,22 +128,18 @@ export function registerTicketWorkflowPrompt(server: McpServer): void {
                 "워크플로우 타입에 따라 티켓을 분석합니다. " +
                 "워크플로우: history(이력분석), technical(기술분석), comprehensive(종합분석), quick(빠른조회)",
             argsSchema: {
-                ticketId: z
-                    .string()
-                    .describe("조회할 티켓 ID (예: QNA00000123456)"),
+                ticketId: z.string().describe("조회할 티켓 ID (예: QNA00000123456)"),
                 workflow: z
                     .enum(["history", "technical", "comprehensive", "quick"])
                     .default("comprehensive")
-                    .describe(
-                        "워크플로우 타입: history(이력), technical(기술), comprehensive(종합), quick(빠른)"
-                    ),
+                    .describe("워크플로우 타입: history(이력), technical(기술), comprehensive(종합), quick(빠른)"),
                 depth: z
                     .enum(["shallow", "normal", "deep"])
                     .default("normal")
                     .describe("분석 깊이: shallow(얕게), normal(보통), deep(깊게)"),
             },
         },
-        async ({ticketId, workflow, depth}) => {
+        async ({ ticketId, workflow, depth }) => {
             // 워크플로우별 프롬프트 생성
             const workflows = {
                 history: generateHistoryWorkflow(ticketId, depth),
@@ -163,7 +159,7 @@ export function registerTicketWorkflowPrompt(server: McpServer): void {
                     },
                 ],
             };
-        }
+        },
     );
 }
 
@@ -178,7 +174,7 @@ function generateHistoryWorkflow(ticketId: string, depth: string): string {
         "## 2단계",
         TOOL_GROUP_TICKETS(ticketId),
         "## 3단계",
-        TOOL_SIMILAR_TICKETS({searchType: "keyword", rows, period: "(최근 3개월)"}),
+        TOOL_SIMILAR_TICKETS({ searchType: "keyword", rows, period: "(최근 3개월)" }),
         "## 4단계",
         TOOL_SIMILAR_TICKET_DETAILS(detailCount),
         "## 5단계",
@@ -186,10 +182,7 @@ function generateHistoryWorkflow(ticketId: string, depth: string): string {
         "**분석:** 과거 문제 해결 과정, 소요 시간, 성공/실패 패턴",
     ];
 
-    steps.push(
-        "\n## 6단계",
-        TOOL_TASK_LOG("(1단계의 taskId)")
-    );
+    steps.push("\n## 6단계", TOOL_TASK_LOG("(1단계의 taskId)"));
 
     const report = [
         REPORT_TICKET_SUMMARY(ticketId),
@@ -232,9 +225,9 @@ function generateTechnicalWorkflow(ticketId: string, depth: string): string {
         "## 3단계",
         TOOL_SITE_LINKS(ticketId),
         "## 4단계",
-        TOOL_SIMILAR_TICKETS({searchType: "keyword", rows: ticketRows, period: "(최근 6개월)"}),
+        TOOL_SIMILAR_TICKETS({ searchType: "keyword", rows: ticketRows, period: "(최근 6개월)" }),
         "## 5단계",
-        "claude-code 의 경우 workspace 내 코드 분석"
+        "claude-code 의 경우 workspace 내 코드 분석",
     ];
 
     return `티켓 ID "${ticketId}"에 대한 **기술 문제 분석**을 수행합니다.
@@ -266,7 +259,6 @@ ${REPORT_TECHNICAL_SOLUTION}
 function generateComprehensiveWorkflow(ticketId: string, depth: string): string {
     const ticketRows = depth === "deep" ? 15 : depth === "normal" ? 10 : 5;
     const detailCount = depth === "deep" ? 5 : 3;
-    const kbRows = depth === "deep" ? 10 : 5;
 
     const phase1 = [
         "### Phase 1: 기본 정보 수집",
@@ -281,7 +273,7 @@ function generateComprehensiveWorkflow(ticketId: string, depth: string): string 
     const phase2 = [
         "### Phase 2: 이력 분석",
         "#### 2-1",
-        TOOL_SIMILAR_TICKETS({searchType: "keyword", rows: ticketRows}),
+        TOOL_SIMILAR_TICKETS({ searchType: "keyword", rows: ticketRows }),
         "#### 2-2",
         TOOL_SIMILAR_TICKET_DETAILS(detailCount),
     ];

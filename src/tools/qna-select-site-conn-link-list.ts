@@ -1,7 +1,7 @@
-import {z} from "zod/v3";
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {callCommand} from "../spring-client.js";
-import {successContent, errorContent} from "../types.js";
+import { z } from "zod/v3";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { callCommand } from "../spring-client.js";
+import { successContent, errorContent } from "../types.js";
 
 // 링크 항목 타입
 interface LinkItem {
@@ -31,23 +31,16 @@ export function registerQnaSelectSiteConnLinkList(server: McpServer): void {
                 "링크들 중 대부분은 구글 드라이브 내 문서이므로 구글 드라이브 커넥터를 이용합니다.\n" +
                 "siteId는 티켓의 customerId 값입니다.",
             inputSchema: {
-                siteId: z
-                    .string()
-                    .describe("고객 사이트 ID (티켓의 customerId 값)"),
+                siteId: z.string().describe("고객 사이트 ID (티켓의 customerId 값)"),
             },
         },
         async (args) => {
-            const response = await callCommand<SiteConnLinkListResponse>(
-                "qnaUIService.selectSiteConnLinkList",
-                {
-                    siteId: args.siteId,
-                }
-            );
+            const response = await callCommand<SiteConnLinkListResponse>("qnaUIService.selectSiteConnLinkList", {
+                siteId: args.siteId,
+            });
 
             if (response.ajaxCallResult !== "S") {
-                return errorContent(
-                    response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류"
-                );
+                return errorContent(response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류");
             }
 
             if (!response.linkList || !Array.isArray(response.linkList)) {
@@ -56,7 +49,7 @@ export function registerQnaSelectSiteConnLinkList(server: McpServer): void {
 
             // link_type 설명 매핑
             const linkTypeMap: Record<string, string> = {
-                SI: "시나리오",
+                SI: "사이트 접속 정보",
                 AM: "AM 문서",
                 CI: "CI 문서",
                 RD: "참고 문서",
@@ -76,6 +69,6 @@ export function registerQnaSelectSiteConnLinkList(server: McpServer): void {
             };
 
             return successContent(summary);
-        }
+        },
     );
 }

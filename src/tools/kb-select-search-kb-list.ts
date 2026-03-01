@@ -1,7 +1,7 @@
-import {z} from "zod/v3";
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {callCommand} from "../spring-client.js";
-import {successContent, errorContent} from "../types.js";
+import { z } from "zod/v3";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { callCommand } from "../spring-client.js";
+import { successContent, errorContent } from "../types.js";
 
 interface KbItem {
     kbId?: string;
@@ -53,66 +53,40 @@ export function registerKbSelectSearchKbList(server: McpServer): void {
                     .string()
                     .regex(/^\d{14}$/, "YYYYMMDDHHMMSS 형식")
                     .describe("조회 종료일시 (YYYYMMDDHHMMSS)"),
-                alias: z
-                    .string()
-                    .describe("고객 ID (티켓의 customerId 값, 예: 263)"),
-                nodeId: z
-                    .string()
-                    .describe("노드 ID (티켓의 domainId 값, 예: NODE0000000456)"),
-                kbId: z
-                    .string()
-                    .optional()
-                    .describe("지식 ID로 검색 (예: KNOW0000005091)"),
-                searchId: z
-                    .string()
-                    .optional()
-                    .describe("검색 키워드"),
-                page: z
-                    .number()
-                    .int()
-                    .min(1)
-                    .optional()
-                    .describe("페이지 번호 (기본값: 1)"),
-                rows: z
-                    .number()
-                    .int()
-                    .min(1)
-                    .max(100)
-                    .optional()
-                    .describe("페이지당 행 수 (기본값: 10)"),
+                alias: z.string().describe("고객 ID (티켓의 customerId 값, 예: 263)"),
+                nodeId: z.string().describe("노드 ID (티켓의 domainId 값, 예: NODE0000000456)"),
+                kbId: z.string().optional().describe("지식 ID로 검색 (예: KNOW0000005091)"),
+                searchId: z.string().optional().describe("검색 키워드"),
+                page: z.number().int().min(1).optional().describe("페이지 번호 (기본값: 1)"),
+                rows: z.number().int().min(1).max(100).optional().describe("페이지당 행 수 (기본값: 10)"),
             },
         },
         async (args) => {
-            const response = await callCommand<KbListResponse>(
-                "kbUIService.selectSearchKbList",
-                {
-                    rows: args.rows ?? 10,
-                    page: args.page ?? 1,
-                    startDate: args.startDate,
-                    endDate: args.endDate,
-                    alias: args.alias ?? "",
-                    nodeId: args.nodeId ?? "",
-                    kbId: args.kbId ?? "",
-                    searchId: args.searchId ?? "",
-                    whereBy: "created_by",
-                    whereByType: "id",
-                    whereHitCount: "",
-                    hitCount: "",
-                    incSubNodeFlag: "Y",
-                    isFavorite: "Y",
-                    webviewFlag: "Y",
-                    nodeWebviewFlag: "Y",
-                    publicFlag: "ALL",
-                    approvalStatus: "APNOT",
-                    dateType: "valide_date",
-                    uniqueFlag: "Y",
-                }
-            );
+            const response = await callCommand<KbListResponse>("kbUIService.selectSearchKbList", {
+                rows: args.rows ?? 10,
+                page: args.page ?? 1,
+                startDate: args.startDate,
+                endDate: args.endDate,
+                alias: args.alias ?? "",
+                nodeId: args.nodeId ?? "",
+                kbId: args.kbId ?? "",
+                searchId: args.searchId ?? "",
+                whereBy: "created_by",
+                whereByType: "id",
+                whereHitCount: "",
+                hitCount: "",
+                incSubNodeFlag: "Y",
+                isFavorite: "Y",
+                webviewFlag: "Y",
+                nodeWebviewFlag: "Y",
+                publicFlag: "ALL",
+                approvalStatus: "APNOT",
+                dateType: "valide_date",
+                uniqueFlag: "Y",
+            });
 
             if (response.ajaxCallResult !== "S") {
-                return errorContent(
-                    response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류"
-                );
+                return errorContent(response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류");
             }
 
             if (!response.dataList || !Array.isArray(response.dataList)) {
@@ -147,6 +121,6 @@ export function registerKbSelectSearchKbList(server: McpServer): void {
             };
 
             return successContent(summary);
-        }
+        },
     );
 }

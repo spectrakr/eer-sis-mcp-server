@@ -1,8 +1,8 @@
-import axios, {AxiosInstance} from "axios";
+import axios, { AxiosInstance } from "axios";
 
 const SPRING_BASE_URL = process.env.SPRING_BASE_URL ?? "http://localhost:19090";
 const SPRING_AJAX_PATH = process.env.SPRING_AJAX_PATH ?? "/enomix/common/ajaxHandler.ex";
-const SESSION_ID = process.env.SESSION_ID ?? "";
+
 const DOMAIN_ID = process.env.SPRING_DOMAIN_ID ?? "NODE0000000001";
 
 const httpClient: AxiosInstance = axios.create({
@@ -29,10 +29,7 @@ function getSessionCookie(): string | null {
  *
  * command 형식: "serviceName.methodName" (예: "ticketUIService.selectList")
  */
-export async function callCommand<T = unknown>(
-    command: string,
-    params: Record<string, unknown> = {}
-): Promise<T> {
+export async function callCommand<T = unknown>(command: string, params: Record<string, unknown> = {}): Promise<T> {
     const sessionCookie = getSessionCookie();
 
     if (!sessionCookie) {
@@ -45,19 +42,13 @@ export async function callCommand<T = unknown>(
 
     // 세션 만료 감지
     if (isSessionExpired(response)) {
-        throw new Error(
-            "세션이 만료되었습니다. .env 파일의 SESSION_ID를 새로운 JSESSIONID로 업데이트하세요."
-        );
+        throw new Error("세션이 만료되었습니다. .env 파일의 SESSION_ID를 새로운 JSESSIONID로 업데이트하세요.");
     }
 
     return response;
 }
 
-async function sendRequest<T>(
-    command: string,
-    params: Record<string, unknown>,
-    sessionCookie: string
-): Promise<T> {
+async function sendRequest<T>(command: string, params: Record<string, unknown>, sessionCookie: string): Promise<T> {
     const formData = new URLSearchParams();
     formData.append("command", command);
     formData.append("domainId", DOMAIN_ID);

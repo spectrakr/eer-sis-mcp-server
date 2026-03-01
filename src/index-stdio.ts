@@ -19,17 +19,17 @@ console.error(`[eer-mcp] .env 파일 경로: ${envPath}`);
 console.error(`[eer-mcp] SESSION_ID: ${process.env.SESSION_ID ? "설정됨" : "설정 안됨"}`);
 
 async function main() {
-  const server = createMcpServer();
-  const transport = new StdioServerTransport();
+    const server = createMcpServer();
+    const transport = new StdioServerTransport();
 
-  console.error("[eer-mcp] stdio MCP 서버 시작");
+    console.error("[eer-mcp] stdio MCP 서버 시작");
 
-  await server.connect(transport);
+    await server.connect(transport);
 
-  console.error("[eer-mcp] Claude Desktop 연결 대기 중...");
+    console.error("[eer-mcp] Claude Desktop 연결 대기 중...");
 }
 
 main().catch((error) => {
-  console.error("[eer-mcp] 오류:", error);
-  process.exit(1);
+    console.error("[eer-mcp] 오류:", error);
+    process.exit(1);
 });

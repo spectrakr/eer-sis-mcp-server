@@ -6,9 +6,9 @@ import { registerInquireTicketPrompt } from "./inquire-ticket.js";
 import { registerTicketWorkflowPrompt } from "./ticket-workflow.js";
 
 export function registerAllPrompts(server: McpServer): void {
-  registerSearchTicketsPrompt(server);
-  registerAnalyzeTicketsPrompt(server);
-  registerDailyReportPrompt(server);
-  registerInquireTicketPrompt(server);
-  registerTicketWorkflowPrompt(server);
+    registerSearchTicketsPrompt(server);
+    registerAnalyzeTicketsPrompt(server);
+    registerDailyReportPrompt(server);
+    registerInquireTicketPrompt(server);
+    registerTicketWorkflowPrompt(server);
 }

@@ -1,7 +1,7 @@
-import {z} from "zod/v3";
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {callCommand} from "../spring-client.js";
-import {errorContent, successContent} from "../types.js";
+import { z } from "zod/v3";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { callCommand } from "../spring-client.js";
+import { errorContent, successContent } from "../types.js";
 
 /**
  * HTML contents에서 이미지 데이터를 필터링하고 HTML 태그를 제거하여 토큰 사용량을 줄입니다.
@@ -18,35 +18,23 @@ function sanitizeContents(contents: string | undefined): string {
 
 function sanitizeImageContent(contents: string) {
     // 1. Base64 인코딩 이미지 제거 (가장 큰 용량)
-    return contents.replace(
-        /data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g,
-        ""
-    );
+    return contents.replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/g, "");
 }
 
 function sanitizeHtmlTag(contents: string) {
     let sanitized = contents;
 
     // 2. 이미지 태그를 파일명으로 축약
-    sanitized = sanitized.replace(
-        /<img[^>]+src="([^"]+)"[^>]*>/gi,
-        (_, url) => {
-            const filename = url.split('/').pop()?.split('?')[0] || 'image';
-            return `[IMAGE: ${filename}] `;
-        }
-    );
+    sanitized = sanitized.replace(/<img[^>]+src="([^"]+)"[^>]*>/gi, (_, url) => {
+        const filename = url.split("/").pop()?.split("?")[0] || "image";
+        return `[IMAGE: ${filename}] `;
+    });
 
     // 3. fileInfo 같은 긴 인코딩 파라미터 제거
-    sanitized = sanitized.replace(
-        /fileInfo=[A-Za-z0-9+/%=]+/g,
-        ""
-    );
+    sanitized = sanitized.replace(/fileInfo=[A-Za-z0-9+/%=]+/g, "");
 
     // 4. script, style 태그와 내용 완전 제거
-    sanitized = sanitized.replace(
-        /<(script|style)[^>]*>[\s\S]*?<\/\1>/gi,
-        ""
-    );
+    sanitized = sanitized.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, "");
 
     // 5. 모든 HTML 태그 제거
     sanitized = sanitized.replace(/<[^>]+>/g, " ");
@@ -141,17 +129,12 @@ export function registerQnaSelectQnaForm(server: McpServer): void {
             },
         },
         async (args) => {
-            const response = await callCommand<QnaFormResponse>(
-                "qnaUIService.selectQnaForm",
-                {
-                    ticketId: args.ticketId,
-                }
-            );
+            const response = await callCommand<QnaFormResponse>("qnaUIService.selectQnaForm", {
+                ticketId: args.ticketId,
+            });
 
             if (response.ajaxCallResult !== "S") {
-                return errorContent(
-                    response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류"
-                );
+                return errorContent(response.ajaxCallMessage ?? response.ajaxCallErrorCode ?? "알 수 없는 오류");
             }
 
             if (!response.dataMap?.qnaForm) {
@@ -211,6 +194,6 @@ export function registerQnaSelectQnaForm(server: McpServer): void {
             };
 
             return successContent(summary);
-        }
+        },
     );
 }

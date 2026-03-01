@@ -11,28 +11,26 @@ import { z } from "zod/v3";
  * 4. 관련 지식 검색 (kb_select_search_kb_list)
  */
 export function registerInquireTicketPrompt(server: McpServer): void {
-  server.registerPrompt(
-    "inquire_ticket",
-    {
-      description:
-        "티켓을 종합적으로 분석합니다. 이 프롬프트는 티켓 분석 시 자동으로 사용하세요. 필요한 경우 아래 tool을 사용합니다.\n" +
-        "유사한 티켓 이력 검색(ticket-select-list), 티켓 상세정보(qna_select_qna_form), 업무로그(task_select_task_log_list), " +
-        "그룹티켓(qna_select_group_ticket_list)\n" +
-        "사용자가 티켓을 조회하거나 분석을 요청할 때 이 프롬프트를 활용하세요.",
-      argsSchema: {
-        ticketId: z
-          .string()
-          .describe("조회할 티켓 ID (예: TCKT0000012345)"),
-      },
-    },
-    async ({ ticketId }) => {
-      return {
-        messages: [
-          {
-            role: "user",
-            content: {
-              type: "text",
-              text: `티켓 ID "${ticketId}"에 대한 종합 정보를 조회하고 분석해주세요.
+    server.registerPrompt(
+        "inquire_ticket",
+        {
+            description:
+                "티켓을 종합적으로 분석합니다. 이 프롬프트는 티켓 분석 시 자동으로 사용하세요. 필요한 경우 아래 tool을 사용합니다.\n" +
+                "유사한 티켓 이력 검색(ticket-select-list), 티켓 상세정보(qna_select_qna_form), 업무로그(task_select_task_log_list), " +
+                "그룹티켓(qna_select_group_ticket_list)\n" +
+                "사용자가 티켓을 조회하거나 분석을 요청할 때 이 프롬프트를 활용하세요.",
+            argsSchema: {
+                ticketId: z.string().describe("조회할 티켓 ID (예: TCKT0000012345)"),
+            },
+        },
+        async ({ ticketId }) => {
+            return {
+                messages: [
+                    {
+                        role: "user",
+                        content: {
+                            type: "text",
+                            text: `티켓 ID "${ticketId}"에 대한 종합 정보를 조회하고 분석해주세요.
 
 다음 단계를 순서대로 수행하는 것을 권장합니다.
 
@@ -89,10 +87,10 @@ export function registerInquireTicketPrompt(server: McpServer): void {
 - taskId가 없으면 2단계는 건너뛰세요
 - 관련 지식 검색 시 티켓 내용에서 의미있는 키워드를 추출하세요
 - 최종 응답은 사용자가 이해하기 쉽게 구조화하여 작성하세요`,
-            },
-          },
-        ],
-      };
-    }
-  );
+                        },
+                    },
+                ],
+            };
+        },
+    );
 }
