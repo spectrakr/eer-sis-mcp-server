@@ -16,7 +16,14 @@ app.use(
     }),
 );
 
-app.use(express.json());
+// /message 엔드포인트는 raw stream 필요하므로 express.json() 제외
+app.use((req, res, next) => {
+    if (req.path === "/message") {
+        next();
+    } else {
+        express.json()(req, res, next);
+    }
+});
 
 // 세션별 SSE transport 관리
 const transports: Record<string, SSEServerTransport> = {};

@@ -7,6 +7,9 @@ import { registerUpdateSessionId } from "./update-session-id.js";
 import { registerTaskSelectTaskLogList } from "./task-select-task-log-list.js";
 import { registerSlackShareContent } from "./slack-share-content.js";
 import { registerRagSearchTicket } from "./rag-search-ticket.js";
+import { registerKbSelectNodeId } from "./kb-select-node-id.js";
+import { registerKbSelectSearchKbList } from "./kb-select-search-kb-list.js";
+import { registerKbGetTranslateScriptKmContents } from "./kb-get-translate-script-km-contents.js";
 
 export function registerAllTools(server: McpServer): void {
     // System tools
@@ -22,15 +25,13 @@ export function registerAllTools(server: McpServer): void {
     registerQnaSelectGroupTicketList(server);
     registerQnaSelectSiteConnLinkList(server);
 
-    // kbUIService
-    // registerKbSelectNodeId(server);
-    // registerKbSelectSearchKbList(server);
-    // registerKbGetTranslateScriptKmContents(server);
+    // kbUIService (ENABLE_KB_TOOLS=true 환경변수로 활성화)
+    if (process.env.ENABLE_KB_TOOLS === "true") {
+        registerKbSelectNodeId(server);
+        registerKbSelectSearchKbList(server);
+        registerKbGetTranslateScriptKmContents(server);
+    }
 
     // taskUIService
     registerTaskSelectTaskLogList(server);
-
-    // TODO: 추가 command는 여기에 등록
-    // registerTicketCreate(server);
-    // ...
 }
