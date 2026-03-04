@@ -3,6 +3,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { callCommand } from "../spring-client.js";
 import { successContent, errorContent } from "../types.js";
 
+// siteId 기반 10분 TTL 인메모리 캐시
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const linkCache = new Map<string, { data: unknown; expireAt: number }>();
+
 // 링크 항목 타입
 interface LinkItem {
     link_name?: string;
@@ -26,15 +30,19 @@ export function registerQnaSelectSiteConnLinkList(server: McpServer): void {
         "qna_select_site_conn_link_list",
         {
             description:
-                "고객 사이트와 연결된 링크 목록을 조회합니다. (command: qnaUIService.selectSiteConnLinkList)\n" +
-                "시나리오, 문서, GIT 저장소, 산출물 등의 링크를 가져옵니다.\n" +
-                "링크들 중 대부분은 구글 드라이브 내 문서이므로 구글 드라이브 커넥터를 이용합니다.\n" +
-                "siteId는 티켓의 customerId 값입니다.",
+                "고객 사이트 연결 링크 목록 조회. (command: qnaUIService.selectSiteConnLinkList)\n" +
+                "siteId = 티켓의 customerId. 시나리오·문서·GIT·산출물 링크 반환 (대부분 구글 드라이브).",
+            annotations: { readOnlyHint: true, idempotentHint: true },
             inputSchema: {
                 siteId: z.string().describe("고객 사이트 ID (티켓의 customerId 값)"),
             },
         },
         async (args) => {
+            const cached = linkCache.get(args.siteId);
+            if (cached && cached.expireAt > Date.now()) {
+                return successContent(cached.data);
+            }
+
             const response = await callCommand<SiteConnLinkListResponse>("qnaUIService.selectSiteConnLinkList", {
                 siteId: args.siteId,
             });
@@ -67,6 +75,8 @@ export function registerQnaSelectSiteConnLinkList(server: McpServer): void {
                     url: item.link_url,
                 })),
             };
+
+            linkCache.set(args.siteId, { data: summary, expireAt: Date.now() + CACHE_TTL_MS });
 
             return successContent(summary);
         },

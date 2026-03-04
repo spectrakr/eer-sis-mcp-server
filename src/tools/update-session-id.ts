@@ -8,7 +8,9 @@ export function registerUpdateSessionId(server: McpServer): void {
         "update_session_id",
         {
             description:
-                "세션 ID를 업데이트합니다. 새로운 세션 ID를 입력하면 현재 실행 중인 MCP 서버의 세션 ID가 즉시 변경되며, .env 파일에도 저장됩니다.",
+                "시스템 도구. 세션 만료 에러 발생 시에만 사용.\n" +
+                "새 JSESSIONID를 입력하면 프로세스 환경변수 및 .env 파일을 즉시 업데이트합니다.",
+            annotations: { readOnlyHint: false, idempotentHint: true },
             inputSchema: {
                 sessionId: z
                     .string()

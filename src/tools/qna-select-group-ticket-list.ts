@@ -42,8 +42,9 @@ export function registerQnaSelectGroupTicketList(server: McpServer): void {
         "qna_select_group_ticket_list",
         {
             description:
-                "특정 티켓과 관련된 그룹 티켓 목록을 조회합니다. (command: qnaUIService.selectGroupTicketList)\n" +
-                "같은 주제로 묶인 티켓들의 이력을 확인할 수 있습니다.",
+                "같은 주제로 묶인 그룹 티켓 이력 조회. (command: qnaUIService.selectGroupTicketList)\n" +
+                "ticketId로 연관된 모든 그룹 티켓 목록 반환.",
+            annotations: { readOnlyHint: true, idempotentHint: true },
             inputSchema: {
                 ticketId: z
                     .string()

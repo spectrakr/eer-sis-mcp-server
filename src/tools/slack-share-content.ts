@@ -11,7 +11,10 @@ export function registerSlackShareContent(server: McpServer): void {
     server.registerTool(
         "slack_share_content",
         {
-            description: "Markdown 형식의 콘텐츠를 ./share 경로에 저장하고 Slack 채널에 공유합니다.",
+            description:
+                "외부 전송 도구. 분석 결과를 Slack 채널에 공유.\n" +
+                "Markdown 콘텐츠를 ./share에 저장하고 Slack 채널로 전송. 쓰기/비멱등 작업.",
+            annotations: { readOnlyHint: false, idempotentHint: false },
             inputSchema: {
                 content: z.string().describe("공유할 Markdown 형식의 내용"),
                 title: z.string().optional().describe("메시지 제목 (선택사항)"),

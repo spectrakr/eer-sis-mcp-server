@@ -36,8 +36,9 @@ export function registerTaskSelectTaskLogList(server: McpServer): void {
         "task_select_task_log_list",
         {
             description:
-                "업무(Task)의 로그 목록을 조회합니다. (command: taskUIService.selectTaskLogList)\n" +
-                "업무 ID를 입력하면 해당 업무의 모든 작업 로그를 반환합니다.",
+                "업무(Task) 작업 로그 목록 조회. (command: taskUIService.selectTaskLogList)\n" +
+                "taskId로 해당 업무의 전체 로그 이력 반환. qna_select_qna_form의 taskId 필드로 연결.",
+            annotations: { readOnlyHint: true, idempotentHint: true },
             inputSchema: {
                 taskId: z.string().min(1, "업무 ID는 필수입니다").describe("업무 ID (예: TASK0000012098)"),
             },

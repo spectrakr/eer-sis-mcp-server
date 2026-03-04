@@ -115,8 +115,9 @@ export function registerQnaSelectQnaForm(server: McpServer): void {
         "qna_select_qna_form",
         {
             description:
-                "특정 티켓의 상세 정보를 조회합니다. (command: qnaUIService.selectQnaForm)\n" +
-                "티켓 ID로 티켓의 전체 내용, 처리 이력, 첨부파일 등을 가져옵니다.",
+                "ticketId로 티켓 상세 정보 drill-down 조회. (command: qnaUIService.selectQnaForm)\n" +
+                "ticket_select_list 또는 rag_search_ticket 결과의 ticketId로 전체 내용·처리 이력·첨부파일 조회.",
+            annotations: { readOnlyHint: true, idempotentHint: true },
             inputSchema: {
                 ticketId: z
                     .string()

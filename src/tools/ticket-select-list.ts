@@ -35,9 +35,10 @@ export function registerTicketSelectList(server: McpServer): void {
         "ticket_select_list",
         {
             description:
-                "티켓 목록을 조회합니다. (command: ticketUIService.selectList)\n" +
-                "날짜 형식: YYYYMMDDHHMMSS (예: 20260219000000)" +
-                "티켓 내용이 길 경우 ",
+                "날짜 범위/상태/고객 기반 티켓 목록 조회. (command: ticketUIService.selectList)\n" +
+                "날짜 형식: YYYYMMDDHHMMSS (예: 20260219000000)\n" +
+                "내용 기반 의미 검색은 rag_search_ticket 사용. 특정 티켓 상세 조회는 qna_select_qna_form 사용.",
+            annotations: { readOnlyHint: true, idempotentHint: true },
             inputSchema: {
                 // 날짜 범위 (필수)
                 startDate: z
@@ -163,11 +164,6 @@ export function registerTicketSelectList(server: McpServer): void {
                 sidx: "",
                 sord: "",
             };
-
-            // option01 ~ option100 빈 값 추가
-            for (let i = 1; i <= 100; i++) {
-                params[`option${String(i).padStart(2, "0")}`] = "";
-            }
 
             const response = await callCommand<TicketListResponse>("ticketUIService.selectList", params);
 
