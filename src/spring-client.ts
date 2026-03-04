@@ -38,11 +38,25 @@ export async function callCommand<T = unknown>(command: string, params: Record<s
 
     console.error(`[spring-client] 요청: ${command}`);
 
-    const response = await sendRequest<T>(command, params, sessionCookie);
+    let response: T;
+    try {
+        response = await sendRequest<T>(command, params, sessionCookie);
+    } catch (error) {
+        if (isRetryableError(error)) {
+            console.error(`[spring-client] 재시도: ${command}`);
+            await sleep(1000);
+            response = await sendRequest<T>(command, params, sessionCookie);
+        } else {
+            throw error;
+        }
+    }
 
-    // 세션 만료 감지
+    // 세션 만료 감지 (HTTP 302 리다이렉트 또는 ajaxCall 에러코드)
     if (isSessionExpired(response)) {
-        throw new Error("세션이 만료되었습니다. .env 파일의 SESSION_ID를 새로운 JSESSIONID로 업데이트하세요.");
+        throw new Error(
+            "세션이 만료되었습니다. update_session_id 도구로 새로운 JSESSIONID를 업데이트하세요.\n" +
+                "(브라우저에서 eNomix에 로그인 후 개발자도구 > Application > Cookies > JSESSIONID 값을 복사하세요.)",
+        );
     }
 
     return response;
@@ -63,9 +77,36 @@ async function sendRequest<T>(command: string, params: Record<string, unknown>, 
         headers: {
             Cookie: sessionCookie,
         },
+        maxRedirects: 0,
+        validateStatus: (status) => status < 400 || status === 302,
     });
 
+    // HTTP 302 리다이렉트 = 로그인 페이지로 이동 = 세션 만료
+    if (response.status === 302) {
+        throw new Error(
+            "세션이 만료되었습니다. update_session_id 도구로 새로운 JSESSIONID를 업데이트하세요.\n" +
+                "(브라우저에서 eNomix에 로그인 후 개발자도구 > Application > Cookies > JSESSIONID 값을 복사하세요.)",
+        );
+    }
+
     return response.data;
+}
+
+function isRetryableError(error: unknown): boolean {
+    if (!error || typeof error !== "object") return false;
+    const e = error as Record<string, unknown>;
+    // 네트워크 오류
+    if (e["code"] === "ECONNREFUSED" || e["code"] === "ECONNRESET" || e["code"] === "ETIMEDOUT") return true;
+    // axios HTTP 오류 — 502/503/504만 재시도
+    if (e["response"] && typeof e["response"] === "object") {
+        const status = (e["response"] as Record<string, unknown>)["status"];
+        return status === 502 || status === 503 || status === 504;
+    }
+    return false;
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function isSessionExpired(response: unknown): boolean {
