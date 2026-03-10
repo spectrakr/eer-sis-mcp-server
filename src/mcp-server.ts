@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerAllTools } from "./tools/index.js";
-import { registerAllPrompts } from "./prompts/index.js";
+import { registerAllWorkflows } from "./workflow/index.js";
 
 export function createMcpServer(): McpServer {
     const server = new McpServer({
@@ -11,8 +11,8 @@ export function createMcpServer(): McpServer {
     // Tools 등록
     registerAllTools(server);
 
-    // Prompts 등록
-    registerAllPrompts(server);
+    // Workflow Tools 등록
+    registerAllWorkflows(server);
 
     return server;
 }
